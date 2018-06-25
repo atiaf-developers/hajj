@@ -1,0 +1,99 @@
+   #login .login-area .margin{
+        margin:40px 0;
+    }
+    #login .login-area #regForm {
+        border-radius: 7px;
+        padding: 30px 10px 40px;
+        box-shadow: 1px 4px 7px 0px #d2d2d2;
+        width: 100%;
+        min-width: 300px;
+        background: #fcfcfc;
+        margin: 40px 0;
+    }
+    #login .login-area regForm h1{
+        color:#1565c0;
+    }
+    #login .login-area label.map{
+        margin-top: 10px;
+    }
+    /* Mark input boxes that gets an error on validation: */
+    #login .login-area input.invalid {
+        background-color: #ffdddd;
+    }
+    #login .login-area input[type="date"]{
+        line-height: normal;
+    }
+    /* Hide all steps by default: */
+    #login .login-area .tab {
+        display: none;
+        width: 100%;
+    }
+    #login .login-area .tab input{
+        margin: 10px 0;
+        text-align: right;
+    }
+    #login .login-area .tab input.text-center{
+        text-align: center;
+    }
+
+    #login .login-area .tab h3{
+        font-size: 20px;
+        color: #0f9ac8;
+        text-align: center;
+        direction: rtl;
+        padding-bottom: 25px;
+        font-weight: bold;
+    }
+
+
+    #login .login-area #regForm button {
+        background-color: #0c86ae;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 17px;
+        cursor: pointer;
+        margin: 25px 0 0 0;
+    }
+    .steps{
+        text-align:center;
+        margin-top:40px;
+    }
+    .next2{
+        float: none;
+        width: 100%;
+        display: block;
+    }
+    #login .login-area #regForm button:hover {
+        opacity: 0.8;
+    }
+    #login .login-area #regForm .tab-details{
+        float: right;
+        width:100%;
+        display: block;
+    }
+    #login .login-area #prevBtn {
+        background-color: #bbbbbb;
+    }
+
+    /* Make circles that indicate the steps of the form: */
+    #login .login-area .step {
+        height: 15px;
+        width: 15px;
+        margin: 0 2px;
+        background-color: #bbbbbb;
+        border: none;  
+        border-radius: 50%;
+        display: inline-block;
+        opacity: 0.5;
+        float:right;
+    }
+
+    #login .login-area .step.active {
+        opacity: 1;
+    }
+
+    /* Mark the steps that are finished and valid: */
+    #login .login-area .step.finish {
+        background-color: #0C86AE;
+    }
