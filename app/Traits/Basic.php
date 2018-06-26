@@ -100,7 +100,7 @@ trait Basic {
             $cases = [];
             foreach ($value_arr as $one) {
                 $id = (int) $one['id'];
-                $cases[] = "WHEN {$id} then {$one['value']}";
+                $cases[] = "WHEN {$id} then '{$one['value']}'";
                 $ids[] = $id;
             }
           

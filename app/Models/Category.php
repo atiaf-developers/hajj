@@ -32,13 +32,15 @@ class Category extends MyModel {
                 ->join('categories_translations','categories.id','=','categories_translations.category_id')
                 ->where('categories_translations.locale',$lang)
                 ->where('categories.active',true)
-                ->select('categories.id','categories_translations.title','categories_translations.description','categories.parent_id')
+                ->select('categories.id','categories_translations.title','categories_translations.description','categories.pdf','categories.pdf_status','categories.parent_id')
                 ->get()
             );
             
         }
         else {
             $transformer->description = $item->description; 
+            $transformer->pdf = url('public/uploads/categories/'.$item->pdf); 
+            $transformer->pdf_status = $item->pdf_status; 
         }
     
         return $transformer;

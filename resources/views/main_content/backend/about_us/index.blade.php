@@ -91,7 +91,7 @@
                             <span class="help-block"></span>
                         </div>
 
-                        <div id="youtube-iframe" class="col-md-12">
+                        <div id="about-youtube-iframe" class="col-md-12">
                             <iframe width="100%" height="315" src="//www.youtube.com/embed/{{$settings['about_youtube_url']->value}}" frameborder="0" allowfullscreen></iframe>
                         </div>
                     </div>

@@ -201,7 +201,7 @@ var BuildingsAccommodation = function () {
             var index = $('select[name^="building"]').index($(this));
             var html = '<option value="">' + lang.choose + '</option>';
             if (building && building != '') {
-                $.get('' + config.admin_url + '/manual_accommodation/floors?building=' + building + '&gender=' + gender, function (data) {
+                $.get('' + config.admin_url + '/buildings_accommodation/floors?building=' + building + '&gender=' + gender, function (data) {
                     if (data.data.length != 0)
                     {
                         $.each(data.data, function (index, Obj) {
@@ -213,6 +213,7 @@ var BuildingsAccommodation = function () {
                             html += '<option ' + disabled + ' value="' + Obj.id + '">' + Obj.number + '</option>';
                         });
                     }
+                    console.log(data.data);
                     $('select[name="floor"]').eq(index).html(html);
 
                 }, "json");

@@ -39,7 +39,7 @@ class BuildingsFloorsRoomsController extends BackendController {
 
     public function store(Request $request) {
         $floor_id = $request->input('floor_id');
-        $this->rules['number'] = "required|unique:buildings_floors_rooms,number,NULL,id,floor_id,$floor_id";
+        $this->rules['number'] = "required|unique:buildings_floors_rooms,number,NULL,id,building_floor_id,$floor_id";
         $validator = Validator::make($request->all(), $this->rules, $this->rules_messages());
         if ($validator->fails()) {
             $errors = $validator->errors()->toArray();
@@ -74,7 +74,7 @@ class BuildingsFloorsRoomsController extends BackendController {
             return _json('error', _lang('app.error_is_occured'), 404);
         }
          $floor_id = $request->input('floor_id');
-        $this->rules['number'] = "required|unique:buildings_floors_rooms,number,$id,id,floor_id,$floor_id";
+        $this->rules['number'] = "required|unique:buildings_floors_rooms,number,$id,id,building_floor_id,$floor_id";
         $validator = Validator::make($request->all(), $this->rules);
 
         if ($validator->fails()) {

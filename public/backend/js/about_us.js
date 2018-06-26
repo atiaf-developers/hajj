@@ -19,9 +19,9 @@ var AboutUs = function () {
             if (value && value != '') {
                 var myId = My.getYoutubeEmbedUrl(value);
 
-                $('#youtube_url').val(myId);
+                $('#about_youtube_url').val(myId);
 
-                $('#youtube-iframe').html('<iframe width="100%" height="315" src="//www.youtube.com/embed/' + myId + '" frameborder="0" allowfullscreen></iframe>');
+                $('#about-youtube-iframe').html('<iframe width="100%" height="315" src="//www.youtube.com/embed/' + myId + '" frameborder="0" allowfullscreen></iframe>');
             }
 
         })

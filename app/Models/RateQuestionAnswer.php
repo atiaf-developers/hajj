@@ -18,6 +18,23 @@ class RateQuestionAnswer extends MyModel
        return $transformer;
         
     }
+    
+    public function translations() {
+        return $this->hasMany(RateQuestionAnswerTranslation::class, 'rate_question_answer_id');
+    }
+
+
+    protected static function boot() {
+        parent::boot();
+
+        static::deleting(function($RateQuestionAnswer) {
+            foreach ($RateQuestionAnswer->translations as $translation) {
+                $translation->delete();
+            }
+        });
+        static::deleted(function($pilgrim_class) {
+        });
+    }
 
 
 

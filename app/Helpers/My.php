@@ -65,9 +65,9 @@ if (!function_exists('customer_url')) {
 }
 if (!function_exists('_lang')) {
 
-    function _lang($item) {
-        if (Lang::has($item)) {
-            $line = Lang::get($item);
+    function _lang($item,$lang_code=null) {
+        if (Lang::has($item,$lang_code)) {
+            $line = Lang::get($item,[],$lang_code);
         } else {
             $item_arr = explode('.', $item);
             array_shift($item_arr);

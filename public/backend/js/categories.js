@@ -73,10 +73,13 @@ var Categories = function () {
             });
         }
 
-        var $description_div = $('#description');
 
-        if ($description_div.length) {
-
+        if (parent_id != 0) {
+//            var image = "input[name='pdf']";
+//            $(image).rules('add', {
+//                accept: "pdf",
+//                filesize: 1000 * 1024
+//            });
             for (var x = 0; x < langs.length; x++) {
                 var ele = "textarea[name='description[" + langs[x] + "]']";
                 $(ele).rules('add', {

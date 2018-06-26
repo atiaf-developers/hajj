@@ -121,7 +121,7 @@ class BuildingsAccommodationController extends BackendController {
                     ->pluck('pilgrims.device_token')
                     ->toArray();
 
-            $notification = ['title' => 'HAJJ', 'body' => implode("\n", Pilgrim::$accommodation_phrases), 'type' => 2];
+            $notification = ['title' =>'تطبيق الحجاج', 'body' => implode("\n", Pilgrim::$accommodation_phrases), 'type' => 2];
             //$this->create_noti($request->input('request_id'), $notifier_id, $request->input('status'), $notifible_type);
             if (count($token_and) > 0) {
                 $Fcm->send($token_and, $notification, 'and');
@@ -269,6 +269,7 @@ class BuildingsAccommodationController extends BackendController {
                 ->select('id', 'number')
                 ->get()
                 ->toArray();
+//        dd($floors);
         return _json('success', $floors);
     }
 

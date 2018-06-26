@@ -14,6 +14,7 @@ class CategoriesController extends BackendController {
     private $rules = array(
         'active' => 'required',
         'this_order' => 'required',
+        'pdf' => 'mimes:pdf|max:10000'
     );
 
     public function __construct() {
@@ -41,7 +42,7 @@ class CategoriesController extends BackendController {
      */
     public function create(Request $request) {
         $parent_id = $request->input('parent') ? $request->input('parent') : 0;
-        $this->data['path'] = $this->node_path($request->input('parent'),true);
+        $this->data['path'] = $this->node_path($request->input('parent'), true);
         $this->data['parent_id'] = $parent_id;
 
         return $this->_view('categories/create', 'backend');
@@ -72,23 +73,27 @@ class CategoriesController extends BackendController {
         }
         DB::beginTransaction();
         try {
-          
+
 
             $category = new Category;
             $category->active = $request->input('active');
             $category->this_order = $request->input('this_order');
             $category->parent_id = $request->input('parent_id');
-
+            if ($category->parent_id != 0) {
+                if ($request->file('pdf')) {
+                    $category->pdf = Category::upload_simple($request->file('pdf'), 'categories');
+                }
+                $category->pdf_status = $request->input('pdf_status');
+            }
             if ($category->parent_id != 0) {
                 $parent = Category::find($category->parent_id);
                 $category->level = $parent->level + 1;
 
                 if ($parent->parents_ids == null) {
                     $category->parents_ids = $parent->id;
-                }
-                else{
-                    $parent_ids = explode(",",$parent->parents_ids);
-                    array_push($parent_ids,$parent->id);
+                } else {
+                    $parent_ids = explode(",", $parent->parents_ids);
+                    array_push($parent_ids, $parent->id);
                     $category->parents_ids = implode(",", $parent_ids);
                 }
             } else {
@@ -144,11 +149,11 @@ class CategoriesController extends BackendController {
      */
     public function edit($id) {
         $category = Category::find($id);
-              
+
         if (!$category) {
             return _json('error', _lang('app.error_is_occured'), 404);
         }
-        $this->data['path'] = $this->node_path($category->parent_id,true);
+        $this->data['path'] = $this->node_path($category->parent_id, true);
         $this->data['category_title_translations'] = CategoryTranslation::where('category_id', $id)->pluck('title', 'locale');
         $this->data['category_description_translations'] = CategoryTranslation::where('category_id', $id)->pluck('description', 'locale');
 
@@ -174,7 +179,7 @@ class CategoriesController extends BackendController {
         }
 
         $columns_arr = array(
-            'title' => 'required|unique:categories_translations,title,'.$id .',category_id'
+            'title' => 'required|unique:categories_translations,title,' . $id . ',category_id'
         );
         if ($category->parent_id != 0) {
             $columns_arr ['description'] = 'required';
@@ -195,6 +200,12 @@ class CategoriesController extends BackendController {
 
             $category->active = $request->input('active');
             $category->this_order = $request->input('this_order');
+            if ($category->parent_id != 0) {
+                if ($request->file('pdf')) {
+                    $category->pdf = Category::upload_simple($request->file('pdf'), 'categories');
+                }
+                $category->pdf_status = $request->input('pdf_status');
+            }
             $category->save();
             CategoryTranslation::where('category_id', $category->id)->delete();
 
@@ -213,6 +224,7 @@ class CategoriesController extends BackendController {
             DB::commit();
             return _json('success', _lang('app.updated_successfully'));
         } catch (\Exception $ex) {
+            dd($ex);
             DB::rollback();
             return _json('error', _lang('app.error_is_occured'), 400);
         }
@@ -250,7 +262,7 @@ class CategoriesController extends BackendController {
                 ->where('categories.parent_id', $parent_id)
                 ->where('categories_translations.locale', $this->lang_code)
                 ->select([
-            'categories.id', "categories_translations.title", "categories.this_order","categories.active", 'categories.level', 'categories.parent_id'
+            'categories.id', "categories_translations.title", "categories.this_order", "categories.active", 'categories.level', 'categories.parent_id'
         ]);
 
         return \Datatables::eloquent($categories)
@@ -293,22 +305,22 @@ class CategoriesController extends BackendController {
                             }
                             return $back;
                         })
-                         ->addColumn('active', function ($item) {
-                          if ($item->active == 1) {
-                          $message = _lang('app.active');
-                          $class = 'label-success';
-                          } else {
-                          $message = _lang('app.not_active');
-                          $class = 'label-danger';
-                          }
-                          $back = '<span class="label label-sm ' . $class . '">' . $message . '</span>';
-                          return $back;
-                          }) 
+                        ->addColumn('active', function ($item) {
+                            if ($item->active == 1) {
+                                $message = _lang('app.active');
+                                $class = 'label-success';
+                            } else {
+                                $message = _lang('app.not_active');
+                                $class = 'label-danger';
+                            }
+                            $back = '<span class="label label-sm ' . $class . '">' . $message . '</span>';
+                            return $back;
+                        })
                         ->escapeColumns([])
                         ->make(true);
     }
 
-    private function node_path($id,$action=false) {
+    private function node_path($id, $action = false) {
         $category = Category::where('id', $id)->first();
         $categories = null;
         if ($category) {
@@ -320,24 +332,23 @@ class CategoriesController extends BackendController {
                     ->orderBy('categories.id', 'ASC')
                     ->select('categories.id', 'trans.title')
                     ->get();
-            $categories= $this->format_path($categories,$action);
+            $categories = $this->format_path($categories, $action);
         }
         return $categories;
     }
 
-    private function format_path($categories,$action) {
+    private function format_path($categories, $action) {
         $html = '';
         if ($categories && $categories->count() > 0) {
             foreach ($categories as $key => $category) {
                 if ($key < ($categories->count() - 1)) {
                     $html .= '<li><a href="' . url('admin/categories?parent=' . $category->id) . '">' . $category->title . '</a><i class="fa fa-circle"></i></li>';
                 } else {
-                    if($action){
+                    if ($action) {
                         $html .= '<li><a href="' . url('admin/categories?parent=' . $category->id) . '">' . $category->title . '</a><i class="fa fa-circle"></i></li>';
-                    }else{
-                         $html .= '<li><span>' . $category->title . '</span></li>';
+                    } else {
+                        $html .= '<li><span>' . $category->title . '</span></li>';
                     }
-                   
                 }
             }
         }

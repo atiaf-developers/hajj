@@ -3,7 +3,7 @@
 @section('pageTitle',_lang('app.rate_question'))
 @section('breadcrumb')
 <li><a href="{{url('admin')}}">{{_lang('app.dashboard')}}</a> <i class="fa fa-circle"></i></li>
-<li><a href="{{url('admin/commen/')}}">{{_lang('app.rate_question')}}</a> <i class="fa fa-circle"></i></li>
+<li><a href="{{url('admin/rate_question')}}">{{_lang('app.rate_question')}}</a> <i class="fa fa-circle"></i></li>
 <li><span> {{_lang('app.add_rate_question')}}</span></li>
 
 @endsection
@@ -29,8 +29,8 @@
                     @foreach ($languages as $key => $value)
                     <div class="col-md-4">
                         <div class="form-group form-md-line-input col-md-12">
-                            <input type="text" class="form-control" id="title[{{ $key }}]" name="title[{{ $key }}]" value="">
-                            <label for="title">{{_lang('app.title') }} {{ _lang('app. '.$value.'') }}</label>
+                            <input type="text" class="form-control" id="title[{{ $key }}]" name="translations[{{ $key }}][title]" value="">
+                            <label for="title">{{ _lang('app.'.$value) }}</label>
                             <span class="help-block"></span>
                         </div>
                     </div>
@@ -56,23 +56,7 @@
                 <div class="table-scrollable" style="border:none;">
                     <table class="table" id="answers-table">
                         <tbody>            
-                            {{--  @php $count=0 @endphp
-                            @foreach($meal_toppings as $meal_topping)
-                            <tr class="answer-one">
-                                <td>
-                                    <input type="text" class="form-control form-filter input-lg" style="width:25%;" name="answers[{{ $count }}]" value="{{ $meal_size->price }}">
-                                    <select class="form-control edited" name="toppings[{{ $count }}][topping_id]">
-                                        @foreach ($toppings as $topping)
-                                        <option {{ $topping->id == $meal_topping->menu_section_topping_id ? 'selected' : '' }} value="{{ $topping->id }}">{{ $topping->title }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <a class="btn btn-danger remove-topping">{{_lang('app.remove')}}</a>
-                                </td>
-                            </tr>
-                            @php $count++ @endphp
-                            @endforeach  --}}
+                           
                         </tbody>
                     </table>
                 </div>

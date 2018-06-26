@@ -19,10 +19,12 @@ use App\Models\RateQuestion;
 use App\Models\RateQuestionAnswer;
 use App\Models\CommunicationGuide;
 use App\Models\AdminNotification;
+use App\Models\Pilgrim;
 use App\Models\Rating;
 use App\Helpers\Fcm;
 use Carbon\Carbon;
 use App\Models\SettingTranslation;
+use App\Models\Device;
 use DB;
 
 class BasicController extends ApiController {
@@ -37,17 +39,38 @@ class BasicController extends ApiController {
         'question_id' => 'required',
         'answer_id' => 'required',
     );
+    private $device_register_rules = array(
+        'device_id' => 'required'
+    );
+
+    public function device_register(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), $this->device_register_rules);
+            if ($validator->fails()) {
+                $errors = $validator->errors()->toArray();
+                return _api_json('', ['errors' => $errors], 400);
+            }
+            Device::updateOrCreate(
+                    ['device_id' => $request->input('device_id')], ['device_id' => $request->input('device_id'), 'updated_at' => Carbon::now()]
+            );
+            return _api_json([], ['message' => _lang('app.device_registered')]);
+        } catch (\Exception $e) {
+            dd($e);
+            return _api_json([], ['message' => _lang('app.error_is_occured')], 400);
+        }
+    }
 
     public function getToken(Request $request) {
         $token = $request->header('authorization');
         if ($token != null) {
             $token = Authorization::validateToken($token);
             if ($token) {
+                //dd($token);
                 $new_token = new \stdClass();
                 if ($token->type == 3) {
-                    $find = Pilgrim::where('id', $user_id)->where('active', true)->first();
+                    $find = Pilgrim::where('id', $token->id)->where('active', true)->first();
                 } else {
-                    $find = User::where('id', $user_id)->where('active', true)->first();
+                    $find = User::where('id', $token->id)->where('active', true)->first();
                 }
                 if ($find != null) {
                     $new_token->id = $find->id;
@@ -70,39 +93,33 @@ class BasicController extends ApiController {
         try {
             $settings = Setting::select('name', 'value')->get()->keyBy('name');
             $settings['social_media'] = json_decode($settings['social_media']->value);
+            //dd(json_decode($settings['info']->value));
             $info = json_decode($settings['info']->value);
+            $supervisors = json_decode($settings['supervisors']->value);
+            unset($settings['supervisors']);
             unset($settings['info']->name);
             unset($settings['info']->value);
-            //dd($info);
-            $settings['info']['about_text'] = $info->about->{$this->lang_code};
-           
+            $settings['info']['about_text'] = $info->about_text->{$this->lang_code};
 
-//            $locations_supervisors[] = Supervisor::transformSetting(json_decode($settings['mena_supervisor']->value));
-//            $locations_supervisors[] = Supervisor::transformSetting(json_decode($settings['arafat_supervisor']->value));
-//            $locations_supervisors[] = Supervisor::transformSetting(json_decode($settings['muzdalifah_supervisor']->value));
-//
-//
-//            $settings['locations_supervisors'] = $locations_supervisors;
-//
-//
-//            if ($settings['video_type']->value == '1') {
-//                $settings['about_video_url']->value = "https://www.youtube.com/embed" . "/" . $settings['youtube_url']->value;
-//            } elseif ($settings['video_type']->value == '2') {
-//                $settings['about_video_url']->value = url('public/uploads/videos') . '/' . $settings['about_video_url']->value;
-//            }
-//           
-//         
-//            if ($settings['declarative_video_type']->value == '1') {
-//                $settings['declarative_video_url']->value = "https://www.youtube.com/embed" . "/" . $settings['declarative_video_youtube_url']->value;
-//            } elseif ($settings['declarative_video_type']->value == '2') {
-//                $settings['declarative_video_url']->value = url('public/uploads/videos') . '/' . $settings['declarative_video_url']->value;
-//            }
+
+            $locations_supervisors[] = Supervisor::transformSetting($supervisors[0]);
+            $locations_supervisors[] = Supervisor::transformSetting($supervisors[1]);
+            $locations_supervisors[] = Supervisor::transformSetting($supervisors[2]);
+            $settings['locations_supervisors'] = $locations_supervisors;
+
+            $settings['about_youtube_url']->value = "https://www.youtube.com/embed" . "/" . $settings['about_youtube_url']->value;
+            $settings['about_video_url']->value = url('public/uploads/videos') . '/' . $settings['about_video_url']->value;
+
+            $settings['declarative_youtube_url']->value = "https://www.youtube.com/embed" . "/" . $settings['declarative_youtube_url']->value;
+
+            $settings['declarative_video_url']->value = url('public/uploads/videos') . '/' . $settings['declarative_video_url']->value;
+
 //
 //            $settings['info'] = SettingTranslation::where('locale', $this->lang_code)->first();
 
-            return _api_json( $settings);
+            return _api_json($settings);
         } catch (\Exception $e) {
-            return _api_json(new \stdClass(), ['message' => $e->getMessage().$e->getLine()], 400);
+            return _api_json(new \stdClass(), ['message' => $e->getMessage() . $e->getLine()], 400);
         }
     }
 
@@ -242,27 +259,34 @@ class BasicController extends ApiController {
 
     public function getNotifications(Request $request) {
         $type = $request->input('type');
+        $device_id = $request->input('device_id');
         if (!in_array($type, [0, 3])) {
             return _api_json([], ['message' => _lang('app.error_is_occured')], 400);
+        }
+        $device = Device::where('device_id', $device_id)->first();
+        if (!$device) {
+            return _api_json([], ['message' => _lang('app.device_is_not_registered')], 400);
         }
         try {
 
             $admin_notifications = AdminNotification::orderBy('admin_notifications.created_at', 'DESC');
-          
+            $admin_notifications->where('admin_notifications.created_at', '>', $device->updated_at);
             if ($type == 0) {
-           
+
                 $admin_notifications->where('admin_notifications.type', 0);
-            }else if ($type == 3) {
-                $admin_notifications->where('admin_notifications.type', 0);
-                $admin_notifications->orWhere('admin_notifications.type', 3);
+            } else if ($type == 3) {
+                $admin_notifications->where(function ($query) {
+                            $query->where('admin_notifications.type', 0);
+                            $query->orWhere('admin_notifications.type', 3);
+                        });
             }
 
             $admin_notifications->select("title", "body", 'created_at', "type");
-            $admin_notifications=$admin_notifications->paginate($this->limit);
-         
+            $admin_notifications = $admin_notifications->paginate($this->limit);
+
             return _api_json(AdminNotification::transformCollection($admin_notifications));
         } catch (\Exception $e) {
-
+            //dd($e);
             return _api_json([], ['message' => _lang('app.error_is_occured')], 400);
         }
     }

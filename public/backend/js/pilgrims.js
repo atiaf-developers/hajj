@@ -360,7 +360,7 @@ var Pilgrims = function () {
             var id = $(t).attr("data-id");
             My.editForm({
                 element: t,
-                url: config.admin_url + '/pilgrims/' + id,
+                url: config.admin_url + '/pilgrims/' + id+'/edit',
                 success: function (data)
                 {
                     console.log(data);

@@ -86,6 +86,7 @@ class ManualAccommodationController extends BackendController {
                 $room_id = $request->input('room');
                 $rooms = $this->getSelectedRooms([$room_id]);
                 if (count($rooms) > 0) {
+                    //dd($room_id);
                     BuildingFloorRoom::where('id', $request->input('room'))->update(['remaining_available_of_accommodation' => $rooms[$room_id]['remaining_available_of_accommodation'] + 1]);
                     $BuildingAccommodation = new BuildingAccommodation;
                     $BuildingAccommodation->pilgrim_id = $pilgrim->id;

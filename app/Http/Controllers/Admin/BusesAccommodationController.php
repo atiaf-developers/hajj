@@ -68,7 +68,7 @@ class BusesAccommodationController extends BackendController {
                     ->select('id', 'bus_number as number', DB::RAW('(num_of_seats-remaining_num_of_seats) as available'))
                     ->where('location_id', $request->input('location'))
                     ->get();
-
+            //dd($buses);
             return _json('success', ['step' => $step, 'buses' => $buses, 'pilgrims_count' => $pilgrims->count()]);
         } else if ($step == 2) {
             DB::beginTransaction();
@@ -126,8 +126,8 @@ class BusesAccommodationController extends BackendController {
                     ->toArray();
      
          
-            $notification_supervisors = ['title' => 'HAJJ', 'body' => implode("\n", Pilgrim::$buses_accommodation_phrases['supervisors']), 'type' => 3];
-            $notification_pilgrims = ['title' => 'HAJJ', 'body' => implode("\n", Pilgrim::$buses_accommodation_phrases['pilgrims']), 'type' => 3];
+            $notification_supervisors = ['title' => 'تطبيق الحجاج', 'body' => implode("\n", Pilgrim::$buses_accommodation_phrases['supervisors']), 'type' => 3];
+            $notification_pilgrims = ['title' => 'تطبيق الحجاج', 'body' => implode("\n", Pilgrim::$buses_accommodation_phrases['pilgrims']), 'type' => 3];
             if (count($supervisors_token_and) > 0) {
                 $Fcm->send($supervisors_token_and, $notification_supervisors, 'and');
             }

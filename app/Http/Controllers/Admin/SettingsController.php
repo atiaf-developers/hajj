@@ -44,13 +44,20 @@ class SettingsController extends BackendController {
         'setting.social_media.twitter' => 'required',
         'setting.social_media.instagram' => 'required',
         'setting.social_media.google' => 'required',
-        'setting.social_media.linkedin' => 'required'
+        'setting.social_media.linkedin' => 'required',
+        'supervisors.0.name' => 'required',
+        'supervisors.0.contact_numbers' => 'required',
+        'supervisors.1.name' => 'required',
+        'supervisors.1.contact_numbers' => 'required',
+        'supervisors.2.name' => 'required',
+        'supervisors.2.contact_numbers' => 'required',
     );
 
     public function index() {
 
         $this->data['settings'] = Setting::get()->keyBy('name');
         $this->data['settings']['social_media'] = json_decode($this->data['settings']['social_media']->value);
+        $this->data['settings']['supervisors'] = json_decode($this->data['settings']['supervisors']->value);
         $this->data['settings_translations'] = SettingTranslation::get()->keyBy('locale');
         return $this->_view('settings/index', 'backend');
     }
@@ -76,17 +83,28 @@ class SettingsController extends BackendController {
             $errors = $validator->errors()->toArray();
             return _json('error', $errors);
         }
-        //dd($request->all());
 
         DB::beginTransaction();
         try {
-//            $this->updateWithMultipleValues('settings',[
-//                'email'=>$request->input('email'),
-//                'phone_1'=>$request->input('phone_1'),
-//                'phone_1'=>$request->input('phone_1'),
-//                'social_media'=> json_encode($request->input('social_media')),
-//            ]);
+
+            $settings = Setting::get()->keyBy('name');
             $setting = $request->input('setting');
+   
+            
+            $supervisors = json_decode($settings['supervisors']->value);
+            if (!empty($request->input('supervisors'))) {
+                foreach ($request->input('supervisors') as $key => $one) {
+                    //dd($one);
+                    $supervisors[$key]->name = $one['name'];
+                    $supervisors[$key]->contact_numbers = $one['contact_numbers'];
+                    if ($image = $request->file('supervisors.' . $key . '.image')) {
+                        $supervisors[$key]->image = Supervisor::upload($image, 'supervisors');
+                    }
+                }
+                //dd($supervisors);
+                Setting::updateOrCreate(
+                        ['name' => 'supervisors'], ['value' => json_encode($supervisors) ]);
+            }
             foreach ($setting as $key => $value) {
                 if ($key == 'social_media') {
                     $value = json_encode($value);

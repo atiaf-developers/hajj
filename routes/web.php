@@ -113,6 +113,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
     Route::post('pilgrims/import', 'PilgrimsController@import');
     Route::post('pilgrims/generate_qr', 'PilgrimsController@generateQr');
     Route::post('pilgrims/data', 'PilgrimsController@data');
+    Route::get('pilgrims/{id}/download-card', 'PilgrimsController@downloadCard');
     Route::resource('locations', 'LocationsController');
     Route::resource('our_locations', 'OurLocationsController');
     Route::resource('categories', 'CategoriesController');
@@ -132,6 +133,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
     // Route For Rate Question Moduel {Start}
     Route::resource('rate_question', 'RateQuestionsController');
+    Route::delete('rate_question/answers/{id}', 'RateQuestionsController@destroy_answer');
     Route::post('rate_question/data', 'RateQuestionsController@data');
     // Route For Rate Question Moduel {End}
     Route::resource('suites_accommodation', 'SuitesAccommodationController');

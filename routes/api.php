@@ -20,6 +20,7 @@ Route::group(['namespace' => 'Api'], function () {
 
 
 
+    Route::post('device_register', 'BasicController@device_register');
     Route::get('/token', 'BasicController@getToken');
     Route::get('/settings', 'BasicController@getSettings');
 

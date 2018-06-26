@@ -11,6 +11,7 @@ use App\Traits\HajjTrait;
 use Validator;
 use DB;
 use QrCode;
+use PDF;
 
 class PilgrimsController extends BackendController {
 
@@ -71,6 +72,13 @@ class PilgrimsController extends BackendController {
                 return _json('error', $ex->getMessage() . $ex->getFile(), 400);
             }
         }
+    }
+
+    public function downloadCard($id) {
+        $find = Pilgrim::getAllAdmin(['pilgrims.id' => $id]);
+        $this->data['pilgrim'] = $find;
+        $pdf = PDF::loadView('main_content.backend.pdf.card', $this->data);
+        return $pdf->stream('card.pdf');
     }
 
     public function generateQr(Request $request) {
@@ -135,7 +143,7 @@ class PilgrimsController extends BackendController {
                 if ($request->file('image')) {
                     $Pilgrim->image = Pilgrim::upload($request->file('image'), 'pilgrims', true);
                 } else {
-                    $Pilgrim->image = $Pilgrim->gender ? 'male.png' : 'female.png';
+                    $Pilgrim->image = $Pilgrim->gender == 1 ? 'male.png' : 'female.png';
                 }
                 $qr_image_name = time() . mt_rand(1, 1000000) . '.png';
                 QrCode::format('png')->size(300)->generate($Pilgrim->code, base_path('public/uploads/pilgrims/' . $qr_image_name));
@@ -155,13 +163,13 @@ class PilgrimsController extends BackendController {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        $find = Pilgrim::find($id);
+        $find = Pilgrim::getAllAdmin(['pilgrims.id' => $id]);
 
-        if ($find) {
-            return _json('success', $find);
-        } else {
-            return _json('success', 'error');
+        if (!$find) {
+            return $this->err404();
         }
+        $this->data['pilgrim'] = $find;
+        return $this->_view('pilgrims.view', 'backend');
     }
 
     /**
@@ -172,14 +180,12 @@ class PilgrimsController extends BackendController {
      */
     public function edit($id) {
         $find = Pilgrim::find($id);
-        if (!$find) {
-            return $this->err404();
+
+        if ($find) {
+            return _json('success', $find);
+        } else {
+            return _json('success', 'error');
         }
-        //dd($this->data['sizes']);
-        $this->data['category'] = $find;
-        $this->data['measurements'] = $this->geBodyMeasurements();
-        $this->data['measurements_selected'] = PilgrimBodyMeasurement::where('category_id', $find->id)->pluck('body_measurement_id')->toArray();
-        return $this->_view('pilgrims/edit', 'backend');
     }
 
     /**
@@ -269,7 +275,7 @@ class PilgrimsController extends BackendController {
                         ->addColumn('options', function ($item) {
 
                             $back = "";
-                            if (\Permissions::check('pilgrims', 'edit') || \Permissions::check('pilgrims', 'delete')) {
+                            if (\Permissions::check('pilgrims', 'edit') || \Permissions::check('pilgrims', 'delete') || \Permissions::check('pilgrims', 'view')) {
                                 $back .= '<div class="btn-group">';
                                 $back .= ' <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false"> options';
                                 $back .= '<i class="fa fa-angle-down"></i>';
@@ -288,6 +294,13 @@ class PilgrimsController extends BackendController {
                                     $back .= '<li>';
                                     $back .= '<a href="" data-toggle="confirmation" onclick = "Pilgrims.delete(this);return false;" data-id = "' . $item->id . '">';
                                     $back .= '<i class = "icon-docs"></i>' . _lang('app.delete');
+                                    $back .= '</a>';
+                                    $back .= '</li>';
+                                }
+                                if (\Permissions::check('pilgrims', 'delete')) {
+                                    $back .= '<li>';
+                                    $back .= '<a href="' . url('admin/pilgrims/' . $item->id) . '">';
+                                    $back .= '<i class = "icon-docs"></i>' . _lang('app.view');
                                     $back .= '</a>';
                                     $back .= '</li>';
                                 }

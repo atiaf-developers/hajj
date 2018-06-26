@@ -47,41 +47,56 @@
 
     </div>
 
-     @if ($parent_id != 0)
-        <div class="panel panel-default" id="description">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{_lang('app.category_description') }}</h3>
-            </div>
-            <div class="panel-body">
+    @if ($parent_id != 0)
+    <div class="panel panel-default" id="description">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{_lang('app.category_description') }}</h3>
+        </div>
+        <div class="panel-body">
 
-                <div class="form-body">
-                   
-                    @foreach ($languages as $key => $value)
+            <div class="form-body">
 
-                    <div class="form-group form-md-line-input col-md-6">
-                        <textarea  class="form-control" id="description[{{ $key }}]" name="description[{{ $key }}]" value="" cols="30" rows="10"></textarea>
-                        <label for="description">{{_lang('app.description') }} {{ _lang('app. '.$key.'') }}</label>
-                        <span class="help-block"></span>
-                    </div>
+                @foreach ($languages as $key => $value)
 
-                    @endforeach
-
-
+                <div class="form-group form-md-line-input col-md-6">
+                    <textarea  class="form-control" id="description[{{ $key }}]" name="description[{{ $key }}]" value="" cols="30" rows="10"></textarea>
+                    <label for="description">{{_lang('app.description') }} {{ _lang('app. '.$key.'') }}</label>
+                    <span class="help-block"></span>
                 </div>
+
+                @endforeach
+
+
             </div>
+        </div>
     </div>
-     @endif
-     
+    @endif
+
 
 
     <div class="panel panel-default">
-       <div class="panel-heading">
-                <h3 class="panel-title"></h3>
-            </div>
         <div class="panel-body">
 
-         
+
             <div class="form-body">
+                
+                @if ($parent_id != 0)
+                <div class="form-group col-md-4">
+                    <label class="control-label">{{_lang('app.pdf')}}</label>
+
+                    <input type="file" name="pdf" id="pdf">     
+                    <span class="help-block"></span>             
+                </div>
+                 <div class="form-group form-md-line-input col-md-3">
+                    <select class="form-control edited" id="pdf_status" name="pdf_status">
+                        <option  value="0">{{ _lang('app.not_active') }}</option>
+                        <option  value="1">{{ _lang('app.active') }}</option>
+                    </select>
+                    <label for="pdf_status">{{_lang('app.pdf_status') }}</label>
+                    <span class="help-block"></span>
+                </div>
+                @endif
+                <div class="clearfix"></div>
                 <div class="form-group form-md-line-input col-md-4">
                     <input type="number" class="form-control" id="this_order" name="this_order" value="">
                     <label for="this_order">{{_lang('app.this_order') }}</label>
@@ -92,14 +107,14 @@
                         <option  value="1">{{ _lang('app.active') }}</option>
                         <option  value="0">{{ _lang('app.not_active') }}</option>
                     </select>
-                     <label for="status">{{_lang('app.status') }}</label>
+                    <label for="status">{{_lang('app.status') }}</label>
                     <span class="help-block"></span>
-                </div> 
+                </div>
 
             </div>
         </div>
 
-         <div class="panel-footer text-center">
+        <div class="panel-footer text-center">
             <button type="button" class="btn btn-info submit-form"
                     >{{_lang('app.save') }}</button>
         </div>
