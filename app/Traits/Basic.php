@@ -85,7 +85,7 @@ trait Basic {
         
     }
 
-    public function updateValues($model, $data) {
+    public function updateValues($model, $data,$quote=false) {
         //dd($values);
         $table = $model::getModel()->getTable();
         //dd($table);
@@ -100,10 +100,16 @@ trait Basic {
             $cases = [];
             foreach ($value_arr as $one) {
                 $id = (int) $one['id'];
-                $cases[] = "WHEN {$id} then '{$one['value']}'";
+                $value =  $one['value'];
+                if($quote){
+                      $cases[] = "WHEN {$id} then '{$value}'";
+                }else{
+                      $cases[] = "WHEN {$id} then {$value}";
+                }
+              
                 $ids[] = $id;
             }
-          
+                
             $cases = implode(' ', $cases);
            
             if($count==0){
@@ -114,11 +120,10 @@ trait Basic {
             $count++;
         }
      
+   
         $ids = implode(',', $ids);
         $sql_str = implode(',', $sql_arr);
         //dd($sql_str);
-        //$params[] = Carbon::now();
-        //return DB::update("UPDATE `$table` SET `remaining_available_of_accommodation` = CASE `id` {$cases} END WHERE `id` in ({$ids})");
         return DB::update("UPDATE `$table` $sql_str WHERE `id` in ({$ids})");
     }
 

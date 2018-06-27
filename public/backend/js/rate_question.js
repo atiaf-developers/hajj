@@ -193,11 +193,11 @@ var RateQuestions = function () {
                     $('#addEditRateQuestionsForm .submit-form').html(lang.save);
 
                     if (data.type == 'success') {
+             
                         My.toast(data.message);
-                        RateQuestions_grid.api().ajax.reload();
-                        if (id == 0) {
-                            RateQuestions.empty();
-                        }
+                        setTimeout(function () {
+                            window.location.href = config.admin_url + "/rate_question";
+                        }, 1500);
 
 
                     } else {

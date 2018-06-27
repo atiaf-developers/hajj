@@ -40,7 +40,7 @@ class AboutUsController extends BackendController {
     );
 
     public function index() {
-
+        //dd('here');
         $this->data['settings'] = Setting::get()->keyBy('name');
         $this->data['settings']['info'] = json_decode($this->data['settings']['info']->value);
 //        dd($this->data['settings']['info']->value->about->$this->lang_code);
@@ -76,6 +76,7 @@ class AboutUsController extends BackendController {
                 Setting::updateOrCreate(
                         ['name' => $key], ['value' => $value]);
             }
+            //dd($request->file('about_video_url'));
             if ($request->file('about_video_url')) {
                 $value = Setting::upload_simple($request->file('about_video_url'), 'videos');
                 Setting::updateOrCreate(

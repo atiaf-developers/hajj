@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-12" style="margin-top: 20px;">
+<!--                <div class="col-md-12" style="margin-top: 20px;">
                     <div class="md-radio col-md-3">
                         <input type="radio" id="about_video_url_radio" {{$settings['about_type']->value==1?'checked':''}} name="setting[about_type]" value="1" class="md-radiobtn">
                         <label for="about_video_url_radio">
@@ -73,7 +73,7 @@
                         </video>
                     </div>
 
-                </div>
+                </div>-->
 
                 <div class="col-md-12" style="margin-top: 20px;">
                     <div class="md-radio col-md-3">
@@ -120,7 +120,7 @@
             <div class="form-body">
            
 
-                <div class="col-md-12" style="margin-top: 20px;">
+<!--                <div class="col-md-12" style="margin-top: 20px;">
                     <div class="md-radio col-md-3">
                         <input type="radio" id="declarative_video_url_radio" {{$settings['declarative_type']->value==0?'checked':''}} name="setting[declarative_type]" value="0" class="md-radiobtn">
                         <label for="declarative_video_url_radio">
@@ -147,7 +147,7 @@
                         </video>
                     </div>
 
-                </div>
+                </div>-->
 
                 <div class="col-md-12" style="margin-top: 20px;">
                     <div class="md-radio col-md-3">

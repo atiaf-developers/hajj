@@ -61,6 +61,26 @@ class RateQuestionsController extends BackendController {
         return $this->_view('rate_question/index', 'backend');
     }
 
+    public function show($id) {
+        $RateQuestion = RateQuestion::join('rate_questions_translations','rate_question.id','=','rate_questions_translations.rate_question_id')
+                ->where('rate_question.id',$id)
+                ->where('rate_questions_translations.locale', $this->lang_code)
+                ->select('rate_question.id','rate_questions_translations.title')
+                ->first();
+        if (!$RateQuestion) {
+            return $this->err404();
+        }
+ 
+        $rateQuestionAnswers = RateQuestionAnswer::join('rate_question_answers_translations','rate_question_answers.id','=','rate_question_answers_translations.rate_question_answer_id')
+                ->where('rate_question_answers.id', $id)
+                ->select('rate_question_answers.id','rate_question_answers_translations.title')
+                ->get();
+
+
+        $this->data['question'] = $RateQuestion;
+        $this->data['answers'] = $rateQuestionAnswers;
+        return $this->_view('rate_question/view', 'backend');
+    }
     public function create() {
         return $this->_view('rate_question/create', 'backend');
     }
@@ -248,16 +268,16 @@ class RateQuestionsController extends BackendController {
                 }
             }
             if (count($question_translations_old_update) > 0) {
-                $this->updateValues('\App\Models\RateQuestionTranslation', $question_translations_old_update);
+                $this->updateValues('\App\Models\RateQuestionTranslation', $question_translations_old_update,true);
             }
             if (count($question_translations_new) > 0) {
                 RateQuestionTranslation::insert($question_translations_new);
             }
             if (count($answers_old_update) > 0) {
-                $this->updateValues('\App\Models\RateQuestionAnswer', $answers_old_update);
+                $this->updateValues('\App\Models\RateQuestionAnswer', $answers_old_update,true);
             }
             if (count($answers_translations_old_update) > 0) {
-                $this->updateValues('\App\Models\RateQuestionAnswerTranslation', $answers_translations_old_update);
+                $this->updateValues('\App\Models\RateQuestionAnswerTranslation', $answers_translations_old_update,true);
             }
             //dd($answers_translations_new);
             if (count($answers_translations_new) > 0) {
@@ -440,11 +460,19 @@ class RateQuestionsController extends BackendController {
                                     $back .= '</a>';
                                     $back .= '</li>';
                                 }
+                                
 
                                 if (\Permissions::check('rate_question', 'delete')) {
                                     $back .= '<li>';
                                     $back .= '<a href="" data-toggle="confirmation" onclick = "RateQuestions.delete(this);return false;" data-id = "' . $item->id . '">';
                                     $back .= '<i class = "icon-docs"></i>' . _lang('app.delete');
+                                    $back .= '</a>';
+                                    $back .= '</li>';
+                                }
+                                if (\Permissions::check('rate_question', 'edit')) {
+                                    $back .= '<li>';
+                                    $back .= '<a href="' .url('admin/rate_question/'.$item->id) . '">';
+                                    $back .= '<i class = "icon-docs"></i>' . _lang('app.view');
                                     $back .= '</a>';
                                     $back .= '</li>';
                                 }
